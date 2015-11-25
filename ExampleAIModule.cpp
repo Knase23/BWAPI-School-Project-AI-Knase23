@@ -10,7 +10,7 @@ BWTA::Region* enemy_base;
 //when a new game has been started with the bot.
 void ExampleAIModule::onStart()
 {
-	Broodwar->sendText("Project:v1!");
+	
 	//Enable flags
 	Broodwar->enableFlag(Flag::UserInput);
 	//Uncomment to enable complete map information
@@ -43,6 +43,7 @@ void ExampleAIModule::onStart()
 			}
 		}
 	}
+	Broodwar->printf("Project:v1!");
 }
 
 //Called when a game is ended.
