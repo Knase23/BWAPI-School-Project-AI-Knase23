@@ -185,10 +185,10 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 			{
 				unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Supply_Depot);
 			}
-			/*else if(amountOfRefinerys < amountOfCommandCenters)
+			else if(this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) < this->getNrOf(BWAPI::UnitTypes::Terran_Command_Center))
 			{
-				unit->build(,BWAPI::UnitTypes::Terran_Supply_Depot);
-			}*/
+				unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Supply_Depot);
+			}
 
 		}
 	}
