@@ -41,13 +41,19 @@ public:
 	void showPlayers();
 	void showForces();
 	Position findGuardPoint();
+	
 	//Jesper Uddefors methods && Variables
 	void workerBuildAction(BWAPI::Unit* unit);
+	void workerMineralOrGas(BWAPI::Unit* unit);
+	
 	bool unitBuyable(BWAPI::UnitType t);
 	bool haveOneOfType(BWAPI::UnitType t);
 	bool needToGetMoreSupply();
+	
 	int getNrOf(BWAPI::UnitType t);
-	BWAPI::TilePosition buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit);
+	
+	TilePosition buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit);
+	
 	Position determineFirstSupplyPos();
 
 };

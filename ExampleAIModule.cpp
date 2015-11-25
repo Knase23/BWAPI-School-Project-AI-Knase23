@@ -93,7 +93,7 @@ void ExampleAIModule::onFrame()
 		{//Iterate through the list of units.
 
 			//Check if unit is a worker and can be interrupted
-			if ((*i)->getType().isWorker() && !(*i)->isConstructing() &&(*i)->isInterruptible() )
+			if ((*i)->getType().isWorker() && !(*i)->isConstructing() &&(*i)->isInterruptible() && !(*i)->isCarryingGas() && !(*i)->isCarryingMinerals() )
 			{
 				workerBuildAction((*i));
 				break;
@@ -107,6 +107,7 @@ void ExampleAIModule::onFrame()
 			if ((*i)->getType().isWorker() && (*i)->isIdle() && !(*i)->isConstructing())
 			{
 				//Order worker to gather resourse.
+
 			} 
 		}
 	}
@@ -188,6 +189,10 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 			return closestGeyser->getTilePosition();
 		}
 	}
+	/*else if(t == BWAPI::UnitTypes::Terran_Refinery)
+	{
+	}*/
+
 }
 //Kollar om spelaren har mer än 0 antal av given typ.
 bool ExampleAIModule::haveOneOfType(BWAPI::UnitType t)
@@ -223,6 +228,15 @@ bool ExampleAIModule::unitBuyable(BWAPI::UnitType t)
 		result = true;
 	}
 	return result;
+}
+
+void ExampleAIModule::workerMineralOrGas(BWAPI::Unit* unit)
+{
+	if()
+	{
+	
+	}
+
 }
 // Worker bygger den dyraste byggnaden den kan bygga.
 void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
