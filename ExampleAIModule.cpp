@@ -10,7 +10,7 @@ BWTA::Region* enemy_base;
 //when a new game has been started with the bot.
 void ExampleAIModule::onStart()
 {
-	Broodwar->sendText("Hello world!");
+	Broodwar->sendText("Project:v1!");
 	//Enable flags
 	Broodwar->enableFlag(Flag::UserInput);
 	//Uncomment to enable complete map information
@@ -116,6 +116,78 @@ void ExampleAIModule::onFrame()
 		drawTerrainData();
 	}
 }
+BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit)
+{
+	if(t == BWAPI::UnitTypes::Terran_Supply_Depot)
+	{
+		Position suitedPos = determineFirstSupplyPos();
+		TilePosition suitedBuildPoint =TilePosition(Position(suitedPos));
+		int xForNext = -3;
+		int yForNext = 2;
+		if(suitedPos.x() < 2000)
+		{
+			xForNext = 3;
+		}
+		if(suitedPos.y() < 2000)
+		{
+			yForNext = -2;
+		}
+		int j = 0;
+		while( j < 32)
+		{
+			if(Broodwar->canBuildHere(unit,suitedBuildPoint,BWAPI::UnitTypes::Terran_Supply_Depot))
+			{
+				Broodwar->printf("Found a suitable spot for Terran_Supply_Depot!");
+				break;
+			}
+			if(j%4 == 0)
+			{
+				suitedBuildPoint += TilePosition(0,yForNext);
+			}
+			else if(j%4 == 1)
+			{
+				suitedBuildPoint += TilePosition(xForNext,0);
+			}
+			else if(j%4 == 2)
+			{
+				suitedBuildPoint += TilePosition(0,-yForNext);
+			}
+			else if(j%2 == 3)
+			{
+				suitedBuildPoint += TilePosition(0,2*yForNext);
+			}
+			j++;
+		}
+		return suitedBuildPoint;
+	}
+	else if(t == BWAPI::UnitTypes::Terran_Refinery)
+	{
+		Unit* closestGeyser = NULL;
+		for(std::set<Unit*>::const_iterator j = Broodwar->self()->getUnits().begin(); j!=Broodwar->self()->getUnits().end();j++)
+		{
+			if((*j)->getType() == BWAPI::UnitTypes::Terran_Command_Center)
+			{
+				for(std::set<Unit*>::const_iterator k=(*j)->getUnitsInRadius(512).begin();k!=(*j)->getUnitsInRadius(512).end();k++)
+				{
+					if((*k)->getType() == BWAPI::UnitTypes::Resource_Vespene_Geyser)
+					{
+						Broodwar->printf("Can build a Terran_Refinery!");
+						closestGeyser = *k;
+						break;
+					}
+				}
+				if(closestGeyser != NULL)
+				{
+					break;
+				}
+			}
+		}
+		if(closestGeyser != NULL)
+		{
+			return closestGeyser->getTilePosition();
+		}
+	}
+}
 //Kollar om spelaren har mer än 0 antal av given typ.
 bool ExampleAIModule::haveOneOfType(BWAPI::UnitType t)
 { 
@@ -151,7 +223,7 @@ bool ExampleAIModule::unitBuyable(BWAPI::UnitType t)
 	}
 	return result;
 }
-// Wokrer bygger den dyraste byggnaden den kan bygga.
+// Worker bygger den dyraste byggnaden den kan bygga.
 void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 {
 	//Try building the most advanced building first and expensive
@@ -183,11 +255,11 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 			//en Vespene Geayser och det rekomenderas att AI bygger en Refinery nära en commandCenter.
 			if(this->needToGetMoreSupply())
 			{
-				unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Supply_Depot);
+				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Supply_Depot,unit),BWAPI::UnitTypes::Terran_Supply_Depot);
 			}
 			else if(this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) < this->getNrOf(BWAPI::UnitTypes::Terran_Command_Center))
 			{
-				unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Supply_Depot);
+				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Refinery,unit),BWAPI::UnitTypes::Terran_Refinery);
 			}
 
 		}
@@ -434,4 +506,51 @@ void ExampleAIModule::showForces()
 void ExampleAIModule::onUnitComplete(BWAPI::Unit *unit)
 {
 	//Broodwar->sendText("A %s [%x] has been completed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
+}
+Position ExampleAIModule::determineFirstSupplyPos()
+{
+	Unit* firstCommandC = NULL;
+	for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
+	{
+		if((*i)->getType().isBuilding())
+		{
+			if((*i)->getType() == BWAPI::UnitTypes::Terran_Command_Center)
+			{
+				firstCommandC = (*i);
+				break;
+			}
+		}
+	}
+	Unit* closestGeyser = NULL;
+	if(!this->haveOneOfType(BWAPI::UnitTypes::Terran_Refinery) && firstCommandC != NULL )
+	{
+		for(std::set<Unit*>::iterator m=Broodwar->getGeysers().begin();m!=Broodwar->getGeysers().end();m++)
+		{
+			if (closestGeyser==NULL || firstCommandC->getDistance(*m) < firstCommandC->getDistance(closestGeyser))
+			{	
+				closestGeyser=*m;
+			}
+		}
+	}
+	else if(firstCommandC != NULL)
+	{
+		for(std::set<Unit*>::iterator m=Broodwar->getAllUnits().begin();m!=Broodwar->getAllUnits().end();m++)
+		{
+			if((*m)->getType() == BWAPI::UnitTypes::Terran_Refinery)
+			{
+				if (closestGeyser==NULL || firstCommandC->getDistance(*m) < firstCommandC->getDistance(closestGeyser))
+				{	
+					closestGeyser=*m;
+				}
+			}
+		}
+	}
+	Position vector = Position();
+	if(firstCommandC != NULL && closestGeyser != NULL)
+	{
+		vector = firstCommandC->getPosition() - closestGeyser->getPosition();
+		Position invert = Position(vector.y(),vector.x());
+		vector = firstCommandC->getPosition() + invert;
+	}
+	return vector;
 }

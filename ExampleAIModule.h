@@ -47,5 +47,7 @@ public:
 	bool haveOneOfType(BWAPI::UnitType t);
 	bool needToGetMoreSupply();
 	int getNrOf(BWAPI::UnitType t);
-	BWAPI::TilePosition buildingSpotFor(BWAPI::UnitType t);
+	BWAPI::TilePosition buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit);
+	Position determineFirstSupplyPos();
+
 };
