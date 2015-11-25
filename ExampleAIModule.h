@@ -43,6 +43,7 @@ public:
 	Position findGuardPoint();
 	
 	//Jesper Uddefors methods && Variables
+
 	void workerBuildAction(BWAPI::Unit* unit);
 	void workerMineralOrGas(BWAPI::Unit* unit);
 	
@@ -55,5 +56,7 @@ public:
 	TilePosition buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit);
 	
 	Position determineFirstSupplyPos();
+
+	Unit* findNearestMineral(BWAPI::Unit *unit);
 
 };

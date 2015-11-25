@@ -15,7 +15,6 @@ void ExampleAIModule::onStart()
 	Broodwar->enableFlag(Flag::UserInput);
 	//Uncomment to enable complete map information
 	Broodwar->enableFlag(Flag::CompleteMapInformation);
-
 	//Start analyzing map data
 	BWTA::readMap();
 	analyzed=false;
@@ -107,8 +106,13 @@ void ExampleAIModule::onFrame()
 			if ((*i)->getType().isWorker() && (*i)->isIdle() && !(*i)->isConstructing())
 			{
 				//Order worker to gather resourse.
-
-			} 
+				this->workerMineralOrGas((*i));
+			}
+			if ((*i)->getType().isResourceDepot() && !(*i)->isTraining() && this->getNrOf(BWAPI::UnitTypes::Terran_SCV) < this->getNrOf(BWAPI::UnitTypes::Terran_Command_Center)*18)
+			{
+				(*i)->setRallyPoint(findNearestMineral((*i)));
+				(*i)->train(BWAPI::UnitTypes::Terran_SCV);
+			}
 		}
 	}
   
@@ -189,9 +193,132 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 			return closestGeyser->getTilePosition();
 		}
 	}
-	/*else if(t == BWAPI::UnitTypes::Terran_Refinery)
+	else if(t == BWAPI::UnitTypes::Terran_Barracks)
 	{
-	}*/
+		Position suitedPos = home->getCenter() + Position(TilePosition(0,-3));
+		TilePosition suitedBuildPoint =TilePosition(suitedPos);
+		int j = 0;
+		int xForNext = -4;
+		int yForNext = 3;
+		if(suitedPos.x() < 2000)
+		{
+			xForNext = 4;
+		}
+		if(suitedPos.y() < 2000)
+		{
+			yForNext = -3;
+		}
+		while(j< 32)
+		{
+			if(Broodwar->canBuildHere(unit,suitedBuildPoint,BWAPI::UnitTypes::Terran_Barracks))
+			{
+				Broodwar->printf("Can build a Terran_Barracks here!");
+				break;
+			}
+			if(j%4 == 0)
+			{
+				suitedBuildPoint += TilePosition(0,yForNext);
+			}
+			else if(j%4 == 1)
+			{
+				suitedBuildPoint += TilePosition(xForNext,0);
+			}
+			else if(j%4 == 2)
+			{
+				suitedBuildPoint += TilePosition(0,-yForNext);
+			}
+			else if(j%2 == 3)
+			{
+				suitedBuildPoint += TilePosition(0,2*yForNext);
+			}
+			j++;
+		}
+		return suitedBuildPoint;
+	}
+	else if(t == BWAPI::UnitTypes::Terran_Academy)
+	{
+		Position suitedPos = home->getCenter() + Position(TilePosition(-3,0));
+		TilePosition suitedBuildPoint =TilePosition(suitedPos);
+		int j = 0;
+		int xForNext = -3;
+		int yForNext = 2;
+		if(suitedPos.x() < 2000)
+		{
+			xForNext = 3;
+		}
+		if(suitedPos.y() < 2000)
+		{
+			yForNext = -2;
+		}
+		while( j < 32)
+		{
+			if(Broodwar->canBuildHere(unit,suitedBuildPoint,BWAPI::UnitTypes::Terran_Academy))
+			{
+				Broodwar->printf("Can build a Terran_Academy here!");
+				break;
+			}
+			if(j%4 == 0)
+			{
+				suitedBuildPoint += TilePosition(0,yForNext);
+			}
+			else if(j%4 == 1)
+			{
+				suitedBuildPoint += TilePosition(xForNext,0);
+			}
+			else if(j%4 == 2)
+			{
+				suitedBuildPoint += TilePosition(0,-yForNext);
+			}
+			else if(j%2 == 3)
+			{
+				suitedBuildPoint += TilePosition(0,2*yForNext);
+			}
+			j++;
+		}
+		return suitedBuildPoint;
+	}
+	else if(t == BWAPI::UnitTypes::Terran_Factory)
+	{
+		Position suitedPos = home->getCenter() + Position(TilePosition(4,0));
+		TilePosition suitedBuildPoint =TilePosition(suitedPos);
+		int j = 0;
+		int xForNext = -4;
+		int yForNext = 3;
+		if(suitedPos.x() < 2000)
+		{
+			xForNext = 4;
+		}
+		if(suitedPos.y() < 2000)
+		{
+			yForNext = -3;
+		}
+		while( j < 32)
+		{
+			if(Broodwar->canBuildHere(unit,suitedBuildPoint,BWAPI::UnitTypes::Terran_Factory))
+			{
+				Broodwar->printf("Can build a Terran_Factory here!");
+				break;
+			}
+
+			if(j%4 == 0)
+			{
+				suitedBuildPoint += TilePosition(0,yForNext);
+			}
+			else if(j%4 == 1)
+			{
+				suitedBuildPoint += TilePosition(xForNext,0);
+			}
+			else if(j%4 == 2)
+			{
+				suitedBuildPoint += TilePosition(0,-yForNext);
+			}
+			else if(j%2 == 3)
+			{
+				suitedBuildPoint += TilePosition(0,2*yForNext);
+			}
+		}
+		return suitedBuildPoint;
+	}
 
 }
 //Kollar om spelaren har mer än 0 antal av given typ.
@@ -232,11 +359,48 @@ bool ExampleAIModule::unitBuyable(BWAPI::UnitType t)
 
 void ExampleAIModule::workerMineralOrGas(BWAPI::Unit* unit)
 {
-	if()
+
+	Unit* closestRefinery = NULL;
+	int nrOfWorkersInStateGatherGas = 0;
+	for(std::set<Unit*>::iterator m=Broodwar->getAllUnits().begin();m!=Broodwar->getAllUnits().end();m++)
 	{
-	
+		if((*m)->getType() == BWAPI::UnitTypes::Terran_Refinery)
+		{
+			if (closestRefinery==NULL || unit->getDistance(*m) < unit->getDistance(closestRefinery))
+			{	
+				closestRefinery=*m;
+			}
+		}
+		if((*m)->getType().isWorker() && (*m)->isGatheringGas())
+		{
+			nrOfWorkersInStateGatherGas++;
+		}
+
+	}
+	if(this->haveOneOfType(BWAPI::UnitTypes::Terran_Refinery) && nrOfWorkersInStateGatherGas <= this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) * 2)
+	{
+		unit->gather(closestRefinery);
+	} 
+	else
+	{
+		Unit* closestMineral = NULL;
+		closestMineral = findNearestMineral(unit);
+		unit->gather(closestMineral);
 	}
 
+
+}
+Unit* ExampleAIModule::findNearestMineral(BWAPI::Unit *unit)
+{
+	Unit* closestMineral=NULL;
+	for(std::set<Unit*>::iterator m=Broodwar->getMinerals().begin();m!=Broodwar->getMinerals().end();m++)
+	{
+		if (closestMineral==NULL || unit->getDistance(*m) < unit->getDistance(closestMineral))
+		{	
+				closestMineral=*m;
+		}
+	}
+	return closestMineral;
 }
 // Worker bygger den dyraste byggnaden den kan bygga.
 void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
@@ -247,7 +411,7 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 		if(this->unitBuyable(BWAPI::UnitTypes::Terran_Factory))
 		{
 			//Note: Se till så AI:en inte bygger för många Factorys
-			unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Factory);
+			unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Factory,unit),BWAPI::UnitTypes::Terran_Factory);
 		}
 		else if(this->unitBuyable(BWAPI::UnitTypes::Terran_Barracks) || this->unitBuyable(BWAPI::UnitTypes::Terran_Academy))
 		{ 
@@ -256,11 +420,11 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 			//är att du har minst en Barracks.
 			if(this->haveOneOfType(BWAPI::UnitTypes::Terran_Barracks) && !this->haveOneOfType(BWAPI::UnitTypes::Terran_Academy))
 			{
-				unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Academy);
+				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Academy,unit),BWAPI::UnitTypes::Terran_Academy);
 			} 
 			else
 			{
-				unit->build(BWAPI::TilePosition(),BWAPI::UnitTypes::Terran_Barracks);
+				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Barracks,unit),BWAPI::UnitTypes::Terran_Barracks);
 			}
 		} 
 		else if(this->unitBuyable(BWAPI::UnitTypes::Terran_Refinery) || this->unitBuyable(BWAPI::UnitTypes::Terran_Supply_Depot))
