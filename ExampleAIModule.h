@@ -43,6 +43,8 @@ public:
 	Position findGuardPoint();
 	
 	//Jesper Uddefors methods && Variables
+	int plannedMineralToUse;
+	int plannedGasToUse;
 
 	void workerBuildAction(BWAPI::Unit* unit);
 	void workerMineralOrGas(BWAPI::Unit* unit);
@@ -56,7 +58,9 @@ public:
 	TilePosition buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit);
 	
 	Position determineFirstSupplyPos();
+	TilePosition findUnexploredPos(BWAPI::Unit *unit);
 
 	Unit* findNearestMineral(BWAPI::Unit *unit);
+
 
 };
