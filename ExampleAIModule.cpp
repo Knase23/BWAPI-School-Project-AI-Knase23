@@ -21,7 +21,8 @@ void ExampleAIModule::onStart()
 	analysis_just_finished=false;
 	//CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL); //Threaded version
 	AnalyzeThread();
-
+	this->plannedMineralToUse = 0;
+	this->plannedGasToUse = 0;
     //Send each worker to the mineral field that is closest to it
     for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
     {
@@ -86,8 +87,10 @@ void ExampleAIModule::onFrame()
 	//Call every 100:th frame
 	if (Broodwar->getFrameCount() % 100 == 0)
 	{   
+		
 		this->plannedMineralToUse = 0;
 		this->plannedGasToUse = 0;
+		
 		//Order one of our workers to build something.
 		
 		for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
@@ -150,11 +153,11 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 		TilePosition suitedBuildPoint =TilePosition(Position(suitedPos));
 		int xForNext = -3;
 		int yForNext = 2;
-		if(suitedPos.x() < Broodwar->mapWidth()/2)
+		if(suitedPos.x() < 2000)//Broodwar->mapWidth()/2
 		{
 			xForNext = 3;
 		}
-		if(suitedPos.y() < Broodwar->mapHeight()/2)
+		if(suitedPos.y() < 2000)//Broodwar->mapHeight()/2
 		{
 			yForNext = -2;
 		}
@@ -215,7 +218,12 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	}
 	else if(t == BWAPI::UnitTypes::Terran_Barracks)
 	{
-		Position suitedPos = home->getCenter() + Position(TilePosition(0,-3));
+		TilePosition whatSide = TilePosition(0,3);
+		if(home->getCenter() < Position(2000,2000))
+		{
+			whatSide = TilePosition(0,-3);
+		}
+		Position suitedPos = home->getCenter() + Position(whatSide);
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
 		int j = 0;
 		int xForNext = -4;
@@ -257,7 +265,12 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	}
 	else if(t == BWAPI::UnitTypes::Terran_Academy)
 	{
-		Position suitedPos = home->getCenter() + Position(TilePosition(-3,-9));
+		TilePosition whatSide = TilePosition(3,9);
+		if(home->getCenter() < Position(2000,2000))
+		{
+			whatSide = TilePosition(-3,-9);
+		}
+		Position suitedPos = home->getCenter() + Position(whatSide);
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
 		int j = 0;
 		int xForNext = -3;
@@ -299,7 +312,13 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	}
 	else if(t == BWAPI::UnitTypes::Terran_Factory)
 	{
-		Position suitedPos = home->getCenter() + Position(TilePosition(4,0));
+
+		TilePosition whatSide = TilePosition(-4,0);
+		if(home->getCenter() < Position(2000,2000))
+		{
+			whatSide = TilePosition(4,0);
+		}
+		Position suitedPos = home->getCenter() + Position(whatSide);
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
 		int j = 0;
 		int xForNext = -4;
