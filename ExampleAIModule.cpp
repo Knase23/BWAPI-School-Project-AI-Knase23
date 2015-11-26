@@ -257,7 +257,7 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	}
 	else if(t == BWAPI::UnitTypes::Terran_Academy)
 	{
-		Position suitedPos = home->getCenter() + Position(TilePosition(-3,0));
+		Position suitedPos = home->getCenter() + Position(TilePosition(-3,-9));
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
 		int j = 0;
 		int xForNext = -3;
@@ -464,7 +464,7 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Supply_Depot.mineralPrice();
 				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Supply_Depot.gasPrice();
 			}
-			else if(this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) < this->getNrOf(BWAPI::UnitTypes::Terran_Command_Center))
+			if(this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) < this->getNrOf(BWAPI::UnitTypes::Terran_Command_Center))
 			{
 				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Refinery,unit),BWAPI::UnitTypes::Terran_Refinery);
 				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Refinery.mineralPrice();
