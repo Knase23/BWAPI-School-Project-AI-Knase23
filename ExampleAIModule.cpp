@@ -133,6 +133,22 @@ void ExampleAIModule::onFrame()
 					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Marine.gasPrice();
 				}
 			}
+			if ((*i)->getType() == BWAPI::UnitTypes::Terran_Factory  && !(*i)->isTraining())
+			{
+				(*i)->setRallyPoint(findGuardPoint());
+				if(this->unitBuyable(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)&& this->getNrOf(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode) + this->getNrOf(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)< 6 && (*i)->getAddon() != NULL)
+				{
+					(*i)->train(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+					this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode.mineralPrice();
+					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode.gasPrice();
+				}
+				else if(this->unitBuyable(BWAPI::UnitTypes::Terran_Machine_Shop)&& (*i)->getAddon() == NULL)
+				{
+					(*i)->buildAddon(BWAPI::UnitTypes::Terran_Machine_Shop);
+					this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Machine_Shop.mineralPrice();
+					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Machine_Shop.gasPrice();
+				}
+			}
 		}
 	}
   
@@ -431,44 +447,54 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 		if(this->unitBuyable(BWAPI::UnitTypes::Terran_Factory) && this->haveOneOfType(BWAPI::UnitTypes::Terran_Barracks) && this->getNrOf(BWAPI::UnitTypes::Terran_Factory)< 2)
 		{
 			//Note: Se till så AI:en inte bygger för många Factorys
-			unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Factory,unit),BWAPI::UnitTypes::Terran_Factory);
-			this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Factory.mineralPrice();
-			this->plannedGasToUse += BWAPI::UnitTypes::Terran_Factory.gasPrice();
+			if(unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Factory,unit),BWAPI::UnitTypes::Terran_Factory))
+			{
+				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Factory.mineralPrice();
+				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Factory.gasPrice();
+			}
 		}
-		else if((this->unitBuyable(BWAPI::UnitTypes::Terran_Barracks) || this->unitBuyable(BWAPI::UnitTypes::Terran_Academy))&& (this->getNrOf(BWAPI::UnitTypes::Terran_Barracks)< 6 || !this->haveOneOfType(BWAPI::UnitTypes::Terran_Academy)))
+		if((this->unitBuyable(BWAPI::UnitTypes::Terran_Barracks) || this->unitBuyable(BWAPI::UnitTypes::Terran_Academy))&& (this->getNrOf(BWAPI::UnitTypes::Terran_Barracks)< 6 || !this->haveOneOfType(BWAPI::UnitTypes::Terran_Academy)))
 		{ 
 			//Note: Se till så AI:en inte bygger för många Barracks och Academys.
 			//Note: Barracks och Academy kostar lika mycket, kravet för att kunna bygga en Academy 
 			//är att du har minst en Barracks.
 			if(this->haveOneOfType(BWAPI::UnitTypes::Terran_Barracks) && !this->haveOneOfType(BWAPI::UnitTypes::Terran_Academy))
 			{
-				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Academy,unit),BWAPI::UnitTypes::Terran_Academy);
-				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Academy.mineralPrice();
-				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Academy.gasPrice();
+				if(unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Academy,unit),BWAPI::UnitTypes::Terran_Academy))
+				{
+					this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Academy.mineralPrice();
+					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Academy.gasPrice();
+				}
 			} 
 			else
 			{
-				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Barracks,unit),BWAPI::UnitTypes::Terran_Barracks);
-				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Barracks.mineralPrice();
-				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Barracks.gasPrice();
+				if(unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Barracks,unit),BWAPI::UnitTypes::Terran_Barracks))
+				{
+					this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Barracks.mineralPrice();
+					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Barracks.gasPrice();
+				}
 			}
 		} 
-		else if(this->unitBuyable(BWAPI::UnitTypes::Terran_Refinery) || this->unitBuyable(BWAPI::UnitTypes::Terran_Supply_Depot))
+		if(this->unitBuyable(BWAPI::UnitTypes::Terran_Refinery) || this->unitBuyable(BWAPI::UnitTypes::Terran_Supply_Depot))
 		{
 			//Note: Se till så AI:en inte bygger för många Supply Depot.
 			//Note: Refinery och Supply Depot kostar lika mycket, Refinery kan bara byggas på 
 			//en Vespene Geayser och det rekomenderas att AI bygger en Refinery nära en commandCenter.
 			if(this->needToGetMoreSupply())
 			{
-				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Supply_Depot,unit),BWAPI::UnitTypes::Terran_Supply_Depot);
-				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Supply_Depot.mineralPrice();
-				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Supply_Depot.gasPrice();
+				if(unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Supply_Depot,unit),BWAPI::UnitTypes::Terran_Supply_Depot))
+				{
+					this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Supply_Depot.mineralPrice();
+					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Supply_Depot.gasPrice();
+				}
 			}
 			else if(this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) < this->getNrOf(BWAPI::UnitTypes::Terran_Command_Center))
 			{
-				unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Refinery,unit),BWAPI::UnitTypes::Terran_Refinery);
-				this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Refinery.mineralPrice();
-				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Refinery.gasPrice();
+				if(unit->build(this->buildingSpotFor(BWAPI::UnitTypes::Terran_Refinery,unit),BWAPI::UnitTypes::Terran_Refinery))
+				{
+					this->plannedMineralToUse += BWAPI::UnitTypes::Terran_Refinery.mineralPrice();
+					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Refinery.gasPrice();
+				}
 			}
 
 		} 
