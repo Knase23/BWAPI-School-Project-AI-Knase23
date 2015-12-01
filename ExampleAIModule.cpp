@@ -175,7 +175,7 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 			yForNext = -2;
 		}
 		int j = 0;
-		while( j < 32)
+		while( j < 32) // Needs To change pattern.
 		{
 			if(Broodwar->canBuildHere(unit,suitedBuildPoint,BWAPI::UnitTypes::Terran_Supply_Depot,true))
 			{
@@ -229,7 +229,7 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 			return closestGeyser->getTilePosition();
 		}
 	}
-	else if(t == BWAPI::UnitTypes::Terran_Barracks)
+	else if(t == BWAPI::UnitTypes::Terran_Barracks) // Change position and the pattern
 	{
 		Position suitedPos = home->getCenter() + Position(TilePosition(0,-3));
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
@@ -271,7 +271,7 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 		}
 		return suitedBuildPoint;
 	}
-	else if(t == BWAPI::UnitTypes::Terran_Academy)
+	else if(t == BWAPI::UnitTypes::Terran_Academy)// Change position and the pattern
 	{
 		Position suitedPos = home->getCenter() + Position(TilePosition(-3,0));
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
@@ -313,7 +313,7 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 		}
 		return suitedBuildPoint;
 	}
-	else if(t == BWAPI::UnitTypes::Terran_Factory)
+	else if(t == BWAPI::UnitTypes::Terran_Factory)// Change position and the pattern
 	{
 		Position suitedPos = home->getCenter() + Position(TilePosition(4,0));
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
