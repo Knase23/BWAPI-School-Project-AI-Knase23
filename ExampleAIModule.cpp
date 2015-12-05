@@ -152,6 +152,18 @@ void ExampleAIModule::onFrame()
 					this->plannedGasToUse += BWAPI::UnitTypes::Terran_Machine_Shop.gasPrice();
 				}
 			}
+			if ((*i)->getType() == BWAPI::UnitTypes::Terran_Machine_Shop  && !Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode) )
+			{
+				(*i)->research(BWAPI::TechTypes::Tank_Siege_Mode);
+				this->plannedMineralToUse += BWAPI::TechTypes::Tank_Siege_Mode.mineralPrice();
+				this->plannedGasToUse += BWAPI::TechTypes::Tank_Siege_Mode.gasPrice();
+			}
+			/*if ((*i)->getType() == BWAPI::UnitTypes::Terran_Academy  && !Broodwar->self()->hasResearched(BWAPI::TechTypes::Tank_Siege_Mode) )
+			{
+				(*i)->research(BWAPI::TechTypes::Tank_Siege_Mode);
+				this->plannedMineralToUse += BWAPI::TechTypes::Tank_Siege_Mode.mineralPrice();
+				this->plannedGasToUse += BWAPI::TechTypes::Tank_Siege_Mode.gasPrice();
+			}*/
 		}
 	}
   
@@ -185,21 +197,17 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 				Broodwar->printf("Found a suitable spot for Terran_Supply_Depot!");
 				break;
 			}
-			if(j%4 == 0)
-			{
-				suitedBuildPoint += TilePosition(0,yForNext);
-			}
-			else if(j%4 == 1)
+			if(j%8 < 3)
 			{
 				suitedBuildPoint += TilePosition(xForNext,0);
 			}
-			else if(j%4 == 2)
+			else if(j%8 == 3)
 			{
-				suitedBuildPoint += TilePosition(0,-yForNext);
+				suitedBuildPoint += TilePosition(0,yForNext);
 			}
-			else if(j%4 == 3)
+			else if(j%8 > 3)
 			{
-				suitedBuildPoint += TilePosition(0,2*yForNext);
+				suitedBuildPoint += TilePosition(-xForNext,0);
 			}
 			j++;
 		}
@@ -234,10 +242,10 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	}
 	else if(t == BWAPI::UnitTypes::Terran_Barracks) // Change position and the pattern
 	{
-		TilePosition whatSide = TilePosition(0,3);
+		TilePosition whatSide = TilePosition(0,6);
 		if(home->getCenter() < Position(2000,2000))
 		{
-			whatSide = TilePosition(0,-3);
+			whatSide = TilePosition(0,-6);
 		}
 		Position suitedPos = home->getCenter() + Position(whatSide);
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
@@ -259,21 +267,17 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 				Broodwar->printf("Can build a Terran_Barracks here!");
 				break;
 			}
-			if(j%4 == 0)
-			{
-				suitedBuildPoint += TilePosition(0,yForNext);
-			}
-			else if(j%4 == 1)
+			if(j%8 < 3)
 			{
 				suitedBuildPoint += TilePosition(xForNext,0);
 			}
-			else if(j%4 == 2)
+			else if(j%8 == 3)
 			{
-				suitedBuildPoint += TilePosition(0,-yForNext);
+				suitedBuildPoint += TilePosition(0,yForNext);
 			}
-			else if(j%4 == 3)
+			else if(j%8 > 3)
 			{
-				suitedBuildPoint += TilePosition(0,2*yForNext);
+				suitedBuildPoint += TilePosition(-xForNext,0);
 			}
 			j++;
 		}
@@ -306,21 +310,17 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 				Broodwar->printf("Can build a Terran_Academy here!");
 				break;
 			}
-			if(j%4 == 0)
-			{
-				suitedBuildPoint += TilePosition(0,yForNext);
-			}
-			else if(j%4 == 1)
+			if(j%8 < 3)
 			{
 				suitedBuildPoint += TilePosition(xForNext,0);
 			}
-			else if(j%4 == 2)
+			else if(j%8 == 3)
 			{
-				suitedBuildPoint += TilePosition(0,-yForNext);
+				suitedBuildPoint += TilePosition(0,yForNext);
 			}
-			else if(j%4 == 3)
+			else if(j%8 > 3)
 			{
-				suitedBuildPoint += TilePosition(0,2*yForNext);
+				suitedBuildPoint += TilePosition(-xForNext,0);
 			}
 			j++;
 		}
@@ -329,19 +329,19 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	else if(t == BWAPI::UnitTypes::Terran_Factory)// Change position and the pattern
 	{
 
-		TilePosition whatSide = TilePosition(-4,0);
+		TilePosition whatSide = TilePosition(-6,0);
 		if(home->getCenter() < Position(2000,2000))
 		{
-			whatSide = TilePosition(4,0);
+			whatSide = TilePosition(6,0);
 		}
 		Position suitedPos = home->getCenter() + Position(whatSide);
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
 		int j = 0;
-		int xForNext = -4;
+		int xForNext = -6;
 		int yForNext = 3;
 		if(suitedPos.x() < Broodwar->mapWidth()/2)
 		{
-			xForNext = 4;
+			xForNext = 6;
 		}
 		if(suitedPos.y() < Broodwar->mapHeight()/2)
 		{
@@ -355,21 +355,17 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 				break;
 			}
 
-			if(j%4 == 0)
+			if(j%8 < 3)
 			{
 				suitedBuildPoint += TilePosition(0,yForNext);
 			}
-			else if(j%4 == 1)
+			else if(j%8 == 3)
 			{
 				suitedBuildPoint += TilePosition(xForNext,0);
 			}
-			else if(j%4 == 2)
+			else if(j%8 > 3 )
 			{
 				suitedBuildPoint += TilePosition(0,-yForNext);
-			}
-			else if(j%4 == 3)
-			{
-				suitedBuildPoint += TilePosition(0,2*yForNext);
 			}
 		}
 		return suitedBuildPoint;
@@ -391,11 +387,11 @@ int ExampleAIModule::getNrOf(BWAPI::UnitType t)
 { 
 	return Broodwar->self()->allUnitCount(t);
 }
-//Kollar om spelaren använder 70% av Supply Totalen
+//Kollar om spelaren använder totalen-8 av Supply Totalen
 bool ExampleAIModule::needToGetMoreSupply()
 {
 	bool result = false;
-	if((float)Broodwar->self()->supplyUsed() > (float)Broodwar->self()->supplyTotal() * 0.7 )
+	if((float)Broodwar->self()->supplyUsed() > (float)Broodwar->self()->supplyTotal() - 8 )
 	{
 		result = true;
 	}
