@@ -91,7 +91,13 @@ void ExampleAIModule::onFrame()
 		this->plannedMineralToUse = 0;
 		this->plannedGasToUse = 0;
 		
-		//Order one of our workers to build something.
+		for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
+		{
+			if((*i)->isBeingConstructed() && (*i)->getType() == BWAPI::UnitTypes::Terran_Supply_Depot)
+			{
+
+			}
+		}
 		
 		for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
 		{//Iterate through the list of units.
@@ -178,7 +184,7 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	if(t == BWAPI::UnitTypes::Terran_Supply_Depot)
 	{
 		Position suitedPos = determineFirstSupplyPos();
-		TilePosition suitedBuildPoint =TilePosition(Position(suitedPos));
+		TilePosition suitedBuildPoint = TilePosition(Position(suitedPos));
 		int xForNext = -3;
 		int yForNext = 2;
 		if(suitedPos.x() < 2000)//Broodwar->mapWidth()/2
@@ -242,16 +248,16 @@ BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Un
 	}
 	else if(t == BWAPI::UnitTypes::Terran_Barracks) // Change position and the pattern
 	{
-		TilePosition whatSide = TilePosition(0,6);
+		TilePosition whatSide = TilePosition(0,-6);
 		if(home->getCenter() < Position(2000,2000))
 		{
-			whatSide = TilePosition(0,-6);
+			whatSide = TilePosition(6,-6);
 		}
 		Position suitedPos = home->getCenter() + Position(whatSide);
 		TilePosition suitedBuildPoint =TilePosition(suitedPos);
 		int j = 0;
 		int xForNext = -4;
-		int yForNext = 3;
+		int yForNext = -3;
 		if(suitedPos.x() < Broodwar->mapWidth()/2)
 		{
 			xForNext = 4;
@@ -422,13 +428,13 @@ void ExampleAIModule::workerMineralOrGas(BWAPI::Unit* unit)
 				closestRefinery=*m;
 			}
 		}
-		if((*m)->getType().isWorker() && (*m)->isGatheringGas())
+		if((*m)->getType().isWorker() && (*m)->isGatheringGas() &&(*m)->getPlayer() == Broodwar->self())
 		{
 			nrOfWorkersInStateGatherGas++;
 		}
 
 	}
-	if(this->haveOneOfType(BWAPI::UnitTypes::Terran_Refinery) && nrOfWorkersInStateGatherGas <= this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) * 2)
+	if(this->haveOneOfType(BWAPI::UnitTypes::Terran_Refinery) && nrOfWorkersInStateGatherGas <= this->getNrOf(BWAPI::UnitTypes::Terran_Refinery) * 3)
 	{
 		unit->gather(closestRefinery);
 	} 

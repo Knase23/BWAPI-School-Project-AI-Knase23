@@ -1,0 +1,22 @@
+- Make a blackboard to check if the my goals are reached if so it can save up to build something else.
+- Make Troops attack when a specific check is made.
+- Make Siege tanks go in to Siege mode
+- Make sure the refinery have units gathering from it.
+
+
+
+Blackboard Checks
+1 - Have 10 or more Marines.
+2 - Have 1 or more Barrack.
+3 - Have 2 or more Supply_depot
+4 - Have 1 or more Academy
+5 - Have 3 or more Medics
+6 - Have constructed 5 or more Workers
+7 - Have 1 or more Refinery
+8 - Have 1 or more Factory
+9 - Have 1 or more Machine_shop
+10 - Have researched Siege mode 
+11 - Have 3 Siege Tanks
+12 - Have check 1,3 & 11 completed  - Go in to function to attack Enemy.
+13 - Have 2 Command Centrers
+14 - 
