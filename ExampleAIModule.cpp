@@ -174,7 +174,7 @@ void ExampleAIModule::onFrame()
 	}
 }
 BWAPI::TilePosition ExampleAIModule::buildingSpotFor(BWAPI::UnitType t,BWAPI::Unit* unit)
-{
+{//Building position and patterns
 	if(t == BWAPI::UnitTypes::Terran_Supply_Depot)
 	{
 		Position suitedPos = determineFirstSupplyPos();
@@ -415,7 +415,7 @@ void ExampleAIModule::workerMineralOrGas(BWAPI::Unit* unit)
 	int nrOfWorkersInStateGatherGas = 0;
 	for(std::set<Unit*>::iterator m=Broodwar->getAllUnits().begin();m!=Broodwar->getAllUnits().end();m++)
 	{
-		if((*m)->getType() == BWAPI::UnitTypes::Terran_Refinery)
+		if((*m)->getType() == BWAPI::UnitTypes::Terran_Refinery && (*m)->getPlayer() == Broodwar->self())
 		{
 			if (closestRefinery==NULL || unit->getDistance(*m) < unit->getDistance(closestRefinery))
 			{	
@@ -468,7 +468,7 @@ void ExampleAIModule::workerBuildAction(BWAPI::Unit* unit)
 				this->plannedGasToUse += BWAPI::UnitTypes::Terran_Factory.gasPrice();
 			}
 		}
-		if((this->unitBuyable(BWAPI::UnitTypes::Terran_Barracks) || this->unitBuyable(BWAPI::UnitTypes::Terran_Academy))&& (this->getNrOf(BWAPI::UnitTypes::Terran_Barracks)< 6 || !this->haveOneOfType(BWAPI::UnitTypes::Terran_Academy)))
+		if((this->unitBuyable(BWAPI::UnitTypes::Terran_Barracks) || this->unitBuyable(BWAPI::UnitTypes::Terran_Academy))&& (this->getNrOf(BWAPI::UnitTypes::Terran_Barracks)< 4 || !this->haveOneOfType(BWAPI::UnitTypes::Terran_Academy)))
 		{ 
 			//Note: Se till så AI:en inte bygger för många Barracks och Academys.
 			//Note: Barracks och Academy kostar lika mycket, kravet för att kunna bygga en Academy 
